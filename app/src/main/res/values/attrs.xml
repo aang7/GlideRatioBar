@@ -8,10 +8,11 @@
         <attr name="EndValue" format="integer"/>
         <attr name="StrokeColor" format="color"/>
         <attr name="StrokeWidth" format="integer"/>
-
+        <attr name="DividerStep" format="integer"/>
+        <attr name="RectColor" format="color"/>
     </declare-styleable>
 
-    <declare-styleable name="GlideRatioGuage">
+   <declare-styleable name="GlideRatioGuage">
         <attr name="PositiveColor" format="color"/>
         <attr name="NegativeColor" format="color"/>
         <attr name="Divisions" format="integer"/>

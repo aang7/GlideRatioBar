@@ -28,6 +28,9 @@ public class GlideRatioBar extends View {
     private int mStartValue;
     private int mEndValue;
     private int mLimit;
+    private int mDividerStep;
+
+    private int mRectColor;
 
     private float mWidth;
     private float mHeight;
@@ -45,10 +48,12 @@ public class GlideRatioBar extends View {
 
         a = context.obtainStyledAttributes(attrs, R.styleable.GlideRatioBar, 0, 0);
 
-        mStrokeColor = a.getColor(R.styleable.GlideRatioBar_StrokeColor, ContextCompat.getColor(context, android.R.color.holo_red_dark));
+        mStrokeColor = a.getColor(R.styleable.GlideRatioBar_StrokeColor, ContextCompat.getColor(context, android.R.color.black));
         mStrokeWidth = a.getInteger(R.styleable.GlideRatioBar_StrokeWidth, 2);
         mStartValue = a.getInteger(R.styleable.GlideRatioBar_StartValue, -100);
         mEndValue = a.getInteger(R.styleable.GlideRatioBar_EndValue, 100);
+        mDividerStep = a.getInteger(R.styleable.GlideRatioBar_DividerStep, 20);
+        mRectColor = a.getColor(R.styleable.GlideRatioBar_RectColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
 
         init();
         a.recycle();
@@ -62,7 +67,7 @@ public class GlideRatioBar extends View {
 
         mRect = new RectF();
         mRectPaint = new Paint();
-        mRectPaint.setColor(Color.GREEN);
+        mRectPaint.setColor(mRectColor);
         mRectPaint.setStrokeWidth(mStrokeWidth);
         mRectPaint.setAntiAlias(true);
 
@@ -120,7 +125,7 @@ public class GlideRatioBar extends View {
         //(int) (mWidth/2)
 
         //The i+=20 it's the mark divisionStep
-        for(int i = 0; i <= mWidth; i+=20) {
+        for(int i = 0; i <= mWidth; i+=mDividerStep) {
 
             Log.d("TAG1", " " + i);
           /*  if (i % 10 == 0) {
@@ -146,6 +151,15 @@ public class GlideRatioBar extends View {
 
     public void setValue(float valor){
         value = valor;
+        if (valor < 0 )
+            changeColor(0XFF259b24);
+        else
+            changeColor(Color.BLUE);
+        invalidate();
+    }
+
+    public void changeColor(int color) {
+        mRectColor = color;
         invalidate();
     }
 }
