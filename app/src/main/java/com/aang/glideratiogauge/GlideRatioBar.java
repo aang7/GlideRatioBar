@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.Typeface;
+import android.renderscript.Type;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,27 +27,28 @@ import android.view.View;
 public class GlideRatioBar extends View {
 
     private Paint mPaint;
-
-    private int mStrokeColor;
-    private int mStrokeWidth;
-    private int mStartValue;
-    private int mEndValue;
-    private int mLimit;
-    private int mDividerStep;
-
-    private int mRectColor;
-
-    private float mWidth;
-    private float mHeight;
-    private RectF mRect;
     private Paint mRectPaint;
     private Paint textPaint;
 
-    private Rect mRECT;
+    private int mStrokeWidth;
+    private int mStartValue;
+    private int mEndValue;
+    private int mDividerStep;
+
+    private int mRectColor;
+    private int mPositiveColor;
+    private int mNegativeColor;
+    private int backgroundColor;
+
+    private float mWidth;
+    private float mHeight;
+
+    private RectF mRect;
+    private PointF textCenter;
 
     TypedArray a;
 
-    private float value = 10;
+    private float value = 10; //for testing
 
 
     public GlideRatioBar(Context context, AttributeSet attrs){
@@ -51,12 +56,15 @@ public class GlideRatioBar extends View {
 
         a = context.obtainStyledAttributes(attrs, R.styleable.GlideRatioBar, 0, 0);
 
-        mStrokeColor = a.getColor(R.styleable.GlideRatioBar_StrokeColor, ContextCompat.getColor(context, android.R.color.black));
         mStrokeWidth = a.getInteger(R.styleable.GlideRatioBar_StrokeWidth, 2);
-        mStartValue = a.getInteger(R.styleable.GlideRatioBar_StartValue, -100);
-        mEndValue = a.getInteger(R.styleable.GlideRatioBar_EndValue, 100);
-        mDividerStep = a.getInteger(R.styleable.GlideRatioBar_DividerStep, 20);
+        mStartValue = a.getInteger(R.styleable.GlideRatioBar_MinValue, -20);//min value
+        mEndValue = a.getInteger(R.styleable.GlideRatioBar_MaxValue, 20);//max value
+        mDividerStep = a.getInteger(R.styleable.GlideRatioBar_DividerStep, 5); //Cada cuanto quiero una marca o division
+
+        backgroundColor = a.getColor(R.styleable.GlideRatioBar_BackgroundColor, ContextCompat.getColor(context, android.R.color.black));
         mRectColor = a.getColor(R.styleable.GlideRatioBar_RectColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
+        mNegativeColor = a.getColor(R.styleable.GlideRatioBar_NegativeColor, ContextCompat.getColor(context, android.R.color.holo_red_dark));
+        mPositiveColor = a.getColor(R.styleable.GlideRatioBar_PositiveColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
 
         a.recycle();
         init();
@@ -64,23 +72,25 @@ public class GlideRatioBar extends View {
 
     public void init(){
         mPaint = new Paint();
-        mPaint.setColor(mStrokeColor);
-        mPaint.setStrokeWidth(2);
+        mPaint.setColor(backgroundColor);
+        mPaint.setStrokeWidth(1);
         mPaint.setAntiAlias(true);
 
-        mRect = new RectF();
         mRectPaint = new Paint();
         mRectPaint.setColor(mRectColor);
         mRectPaint.setStrokeWidth(mStrokeWidth);
         mRectPaint.setAntiAlias(true);
+        //mRectPaint.setShader(new LinearGradient(0, 0, mWidth, 200,  Color.RED,Color.BLUE, Shader.TileMode.CLAMP));//only for see how it works
 
         textPaint = new Paint();
-        textPaint.setColor(Color.RED);
+        textPaint.setColor(Color.WHITE);
         textPaint.setStrokeWidth(2);
         textPaint.setAntiAlias(true);
-
-        mRECT = new Rect();
-
+        textPaint.setTextSize(20);
+        Typeface sample = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC);
+        Typeface leadCot = Typeface.createFromAsset(getContext().getAssets(), "lead_coat/leadcoat.ttf");
+        //textPaint.setTypeface(leadCot);
+        mRect = new RectF();
 
     }
 
@@ -88,12 +98,6 @@ public class GlideRatioBar extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
-        /*if (mDstBitmap != null)
-            mDstBitmap.recycle();
-
-        if (linesBitmap != null)
-            linesBitmap.recycle();*/
 
         mWidth = w;
         mHeight = h;
@@ -103,7 +107,8 @@ public class GlideRatioBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawColor(Color.BLACK);
+        canvas.drawColor(backgroundColor); //Background and divisionSteps mark with the same color
+
         //Let's set up the measuere with the paddings
         float paddingLeft = getPaddingLeft();
         float paddingRight= getPaddingRight();
@@ -125,22 +130,16 @@ public class GlideRatioBar extends View {
 
         mRectPaint.setColor(mRectColor);
 
-        //mRect.set(mWidth/2, 0,mWidth/2 + (value),mHeight);
-
+        mRect.set(mWidth / 2, 0, mWidth / 2 + (value * ((mWidth / 2) / mEndValue)), mHeight); //above zero
 
         if (mRect.left > mRect.right) /* due to RectF method not support create a rect from left to right: left must be <= right */
-            mRect.set(mWidth/2 + (value*((mWidth/2)/mEndValue)), 0,mWidth/2,mHeight); //below zero
-        else
-            mRect.set(mWidth/2, 0,mWidth/2 + (value*((mWidth/2)/mEndValue)),mHeight); //above zero
+            mRect.set(mWidth/2 + (value*((mWidth/2)/-mStartValue)), 0,mWidth/2,mHeight); //below zero
 
 
-        Log.d("COORDINATES", " " + (mWidth/2 + (value*((mWidth/2)/mEndValue))));
         canvas.drawRect(mRect, mRectPaint);
 
 
         //Lets draw the MARKLINES
-        //(int) (mWidth/2)
-
         //The i+=20 it's the mark divisionStep
         for(int i = 0; i <= mWidth; i+=mDividerStep) {
 
@@ -152,7 +151,7 @@ public class GlideRatioBar extends View {
                 canvas.drawLine((((i - mWidth / 2) * ((mWidth / 2) / (mEndValue))) - mWidth / 2), 0, (((i - mWidth / 2) * ((mWidth / 2) / (mEndValue))) - mWidth / 2), mHeight, mPaint);
             }*/
 
-            canvas.drawLine((i*((mWidth/2)/mEndValue)), 0, (i*((mWidth/2)/mEndValue)), mHeight, mPaint); //WORKING!
+            canvas.drawLine((i*((mWidth/2)/mEndValue)), 0, (i*((mWidth/2)/mEndValue)), mHeight, mPaint); //apparently WORKING!
 
             //canvas.drawLine((((i)*((mWidth/2)/(mEndValue))) - mWidth/2), 0, (((i)*((mWidth/2)/(mEndValue))) - mWidth/2), mHeight, mPaint);
 
@@ -163,20 +162,38 @@ public class GlideRatioBar extends View {
 
         }
 
+        /* Let's draw showValue Text */
+
+        String string = String.format("%.2f", value);
+        float valueStringWidth = textPaint.measureText(string);
+        //textCenter = new PointF(mWidth/2 - valueStringWidth, mHeight/2);
+
+        if ((mWidth/2 + (value * ((mWidth / 2) / mEndValue))) <= mWidth && (mWidth/2 + (value * ((mWidth / 2) /-mStartValue))) >= 0) {
+            if (value > 0)
+                canvas.drawText(String.format("%.2f", value), mWidth / 2 + (value * ((mWidth / 2) / mEndValue)) - valueStringWidth, mHeight / 2, textPaint);
+            else
+                canvas.drawText(String.format("%.2f", value), mWidth / 2 + (value * ((mWidth / 2) / -mStartValue)), mHeight / 2, textPaint);
+        }else {
+            if (value > 0)
+                canvas.drawText(Float.toString(value), mWidth / 2 + (mEndValue * ((mWidth / 2) / mEndValue)) - valueStringWidth, mHeight / 2, textPaint);
+            else
+                canvas.drawText(Float.toString(value), mWidth / 2 + (mStartValue * ((mWidth / 2) / -mStartValue)), mHeight / 2, textPaint);
+        }
+
     }
 
 
     public void setValue(float valor){
         value = valor;
         if (valor < 0 )
-            changeColor(Color.RED);
+            changeColor(mNegativeColor);
         else
-            changeColor(Color.BLUE);
+            changeColor(mPositiveColor);
+
         invalidate();
     }
 
     public void changeColor(int color) {
         mRectColor = color;
-        invalidate();
     }
 }

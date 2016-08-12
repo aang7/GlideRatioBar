@@ -2,21 +2,14 @@
 <resources>
 
     <declare-styleable name="GlideRatioBar">
-        <attr name="Limit" format="integer" />
-        <attr name="DivisionStep" format="integer"/>
-        <attr name="StartValue" format="integer"/>
-        <attr name="EndValue" format="integer"/>
-        <attr name="StrokeColor" format="color"/>
+        <attr name="NegativeColor" format="color"/>
+        <attr name="PositiveColor" format="color"/>
+        <attr name="MinValue" format="integer"/>
+        <attr name="MaxValue" format="integer"/>
+        <attr name="BackgroundColor" format="color"/>
         <attr name="StrokeWidth" format="integer"/>
         <attr name="DividerStep" format="integer"/>
         <attr name="RectColor" format="color"/>
-    </declare-styleable>
-
-   <declare-styleable name="GlideRatioGuage">
-        <attr name="PositiveColor" format="color"/>
-        <attr name="NegativeColor" format="color"/>
-        <attr name="Divisions" format="integer"/>
-        <attr name="Scale" format="integer"/>
     </declare-styleable>
 
 
