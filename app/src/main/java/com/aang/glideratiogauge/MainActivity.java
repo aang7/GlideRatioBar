@@ -45,12 +45,12 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     public void onClickIncrementButton(View view){
-        value += 2;
+        value += 200;
         //glideRatioBar.setValue(value);
     }
 
     public void onClickDecrementButton(View view){
-        value -= 2;
+        value -= 200;
         //glideRatioBar.setValue(value);
     }
 

@@ -13,6 +13,7 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.renderscript.Type;
 import android.support.v4.content.ContextCompat;
+import android.text.LoginFilter;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -86,7 +87,7 @@ public class GlideRatioBar extends View {
         textPaint.setColor(Color.WHITE);
         textPaint.setStrokeWidth(2);
         textPaint.setAntiAlias(true);
-        textPaint.setTextSize(20);
+        textPaint.setTextSize(15);
         Typeface sample = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC);
         Typeface leadCot = Typeface.createFromAsset(getContext().getAssets(), "lead_coat/leadcoat.ttf");
         //textPaint.setTypeface(leadCot);
@@ -130,45 +131,57 @@ public class GlideRatioBar extends View {
 
         mRectPaint.setColor(mRectColor);
 
-        mRect.set(mWidth / 2, 0, mWidth / 2 + (value * ((mWidth / 2) / mEndValue)), mHeight); //above zero
 
+        //mRect.set(mWidth / 2, 0, mWidth / 2 + (value * ((mWidth / 2) / mEndValue)), mHeight); //above zero
+        //if (mRect.left > mRect.right) /* due to RectF method not support create a rect from left to right: left must be <= right */
+            //mRect.set(mWidth/2 + (value*((mWidth/2)/-mStartValue)), 0,mWidth/2,mHeight); //below zero
+
+
+        mRect.set(mWidth / 2, 0, mWidth / 2 + (value * ((mWidth / 2) / mEndValue)), mHeight/1.5f); //above zero
         if (mRect.left > mRect.right) /* due to RectF method not support create a rect from left to right: left must be <= right */
-            mRect.set(mWidth/2 + (value*((mWidth/2)/-mStartValue)), 0,mWidth/2,mHeight); //below zero
+            mRect.set(mWidth/2 + (value*((mWidth/2)/-mStartValue)), 0,mWidth/2,mHeight/1.5f); //below zero
 
 
         canvas.drawRect(mRect, mRectPaint);
 
 
-        //Lets draw the MARKLINES
+        //Lets mark the lines and valuesDividerStep
         //The i+=20 it's the mark divisionStep
         for(int i = 0; i <= mWidth; i+=mDividerStep) {
 
-            //Log.d("TAG1", " " + i);
-          /*  if (i % 10 == 0) {
-                //canvas.drawLine((mWidth/2) + i, 0, (mWidth/2) + i, mHeight, mPaint);
-                //canvas.drawLine(((mWidth/2)/3)+i, 0, ((mWidth/2)/3)+i, mHeight, mPaint);
-                //canvas.drawLine(((i*10)*((mWidth/2)/mEndValue)), 0, ((i*10)*((mWidth/2)/mEndValue)), mHeight, mPaint);
-                canvas.drawLine((((i - mWidth / 2) * ((mWidth / 2) / (mEndValue))) - mWidth / 2), 0, (((i - mWidth / 2) * ((mWidth / 2) / (mEndValue))) - mWidth / 2), mHeight, mPaint);
-            }*/
+            //Mark Lines
+            canvas.drawLine((i*((mWidth/2)/mEndValue)), 0, (i*((mWidth/2)/mEndValue)), mHeight/1.5f, mPaint); //apparently WORKING!
 
-            canvas.drawLine((i*((mWidth/2)/mEndValue)), 0, (i*((mWidth/2)/mEndValue)), mHeight, mPaint); //apparently WORKING!
+            String rollString = String.valueOf(mStartValue + i);
+            float rollStringWidth = textPaint.measureText(rollString);
 
-            //canvas.drawLine((((i)*((mWidth/2)/(mEndValue))) - mWidth/2), 0, (((i)*((mWidth/2)/(mEndValue))) - mWidth/2), mHeight, mPaint);
-
-            //canvas.drawLine((value*((mWidth/2)/mEndValue)), 0, (value*((mWidth/2)/mEndValue)), mHeight, mPaint);
-
-            //Asi agarro la mitad de la barra
-            //canvas.drawLine(((i)*((mWidth/2)/mEndValue)), 0, ((i)*((mWidth/2)/mEndValue)), mHeight, mPaint);
+            if ((i*((mWidth/2)/mEndValue)) > mWidth) {
+                break;
+            }
+            else if ((((i)*(mWidth/2)/mEndValue)-rollStringWidth/2) < 0 ) {
+                canvas.drawText(rollString, ((i) * (mWidth / 2) / mEndValue), mHeight / 1.1f, textPaint);
+            }
+            else if ((((i)*(mWidth/2)/mEndValue)-rollStringWidth/4) > mWidth) {
+                canvas.drawText(rollString, mWidth - rollStringWidth, mHeight / 1.1f, textPaint);
+            }
+            else {
+                if (rollString.equals(Integer.toString(mEndValue))) //Falta optimizar esto
+                    canvas.drawText(rollString, mWidth - rollStringWidth, mHeight / 1.1f, textPaint);
+                else
+                    canvas.drawText(rollString, ((i) * (mWidth / 2) / mEndValue) - rollStringWidth / 2, mHeight / 1.1f, textPaint);
+            }
 
         }
 
-        /* Let's draw showValue Text */
 
+
+        /* Let's draw showValue Text */
         String string = String.format("%.2f", value);
         float valueStringWidth = textPaint.measureText(string);
         //textCenter = new PointF(mWidth/2 - valueStringWidth, mHeight/2);
 
-        if ((mWidth/2 + (value * ((mWidth / 2) / mEndValue))) <= mWidth && (mWidth/2 + (value * ((mWidth / 2) /-mStartValue))) >= 0) {
+        /* show Value following the bar - WORKING */
+        /*if ((mWidth/2 + (value * ((mWidth / 2) / mEndValue))) <= mWidth && (mWidth/2 + (value * ((mWidth / 2) /-mStartValue))) >= 0) {
             if (value > 0)
                 canvas.drawText(String.format("%.2f", value), mWidth / 2 + (value * ((mWidth / 2) / mEndValue)) - valueStringWidth, mHeight / 2, textPaint);
             else
@@ -178,7 +191,10 @@ public class GlideRatioBar extends View {
                 canvas.drawText(Float.toString(value), mWidth / 2 + (mEndValue * ((mWidth / 2) / mEndValue)) - valueStringWidth, mHeight / 2, textPaint);
             else
                 canvas.drawText(Float.toString(value), mWidth / 2 + (mStartValue * ((mWidth / 2) / -mStartValue)), mHeight / 2, textPaint);
-        }
+        }*/
+
+        /*Showing value in the middle*/
+        canvas.drawText(String.format("%.2f", value), mWidth/2, mHeight/2, textPaint);
 
     }
 
