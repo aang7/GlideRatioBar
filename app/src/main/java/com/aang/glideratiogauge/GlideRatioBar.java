@@ -40,6 +40,7 @@ public class GlideRatioBar extends View {
     private int mPositiveColor;
     private int mNegativeColor;
     private int backgroundColor;
+    private int mTextColor;
 
     private float mWidth;
     private float mHeight;
@@ -66,6 +67,7 @@ public class GlideRatioBar extends View {
         mRectColor = a.getColor(R.styleable.GlideRatioBar_RectColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
         mNegativeColor = a.getColor(R.styleable.GlideRatioBar_NegativeColor, ContextCompat.getColor(context, android.R.color.holo_red_dark));
         mPositiveColor = a.getColor(R.styleable.GlideRatioBar_PositiveColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
+        mTextColor = a.getColor(R.styleable.GlideRatioBar_TextColor, ContextCompat.getColor(context, android.R.color.black));
 
         a.recycle();
         init();
@@ -84,7 +86,7 @@ public class GlideRatioBar extends View {
         //mRectPaint.setShader(new LinearGradient(0, 0, mWidth, 200,  Color.RED,Color.BLUE, Shader.TileMode.CLAMP));//only for see how it works
 
         textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
+        textPaint.setColor(mTextColor);
         textPaint.setStrokeWidth(2);
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(15);

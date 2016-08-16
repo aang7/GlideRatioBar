@@ -25,10 +25,11 @@
         app:RectColor="@color/md_green_800"
         app:NegativeColor="@color/md_red_900"
         app:PositiveColor="@color/md_green_900"
-        app:BackgroundColor="@color/md_black_1000"
+        app:BackgroundColor="@color/md_white_1000"
         app:MaxValue="50"
         app:MinValue="-50"
-        app:DividerStep="20"
+        app:DividerStep="10"
+        app:TextColor="@color/md_black_1000"
         />
 
     <TextView

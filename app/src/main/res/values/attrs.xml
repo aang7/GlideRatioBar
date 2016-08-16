@@ -10,6 +10,7 @@
         <attr name="StrokeWidth" format="integer"/>
         <attr name="DividerStep" format="integer"/>
         <attr name="RectColor" format="color"/>
+        <attr name="TextColor" format="color"/>
     </declare-styleable>
 
 
