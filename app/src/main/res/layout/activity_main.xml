@@ -12,7 +12,7 @@
 
 
     <com.aang.glideratiogauge.GlideRatioBar
-        android:layout_width="400dp"
+        android:layout_width="300dp"
         android:layout_height="50dp"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
@@ -20,16 +20,15 @@
         android:paddingRight="5dp"
         android:id="@+id/view"
         android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        app:RectColor="@color/md_green_800"
         app:NegativeColor="@color/md_red_900"
         app:PositiveColor="@color/md_green_900"
-        app:BackgroundColor="@color/md_white_1000"
-        app:MaxValue="50"
-        app:MinValue="-50"
-        app:DividerStep="10"
-        app:TextColor="@color/md_black_1000"
+        app:BackgroundColor="@color/md_black_1000"
+        app:MaxValue="20"
+        app:MinValue="-20"
+        app:DividerStep="5"
+        app:TextColor="@color/md_white_1000"
+        app:TextSize="20"
+        app:StrokeWidth="3"
         />
 
     <TextView

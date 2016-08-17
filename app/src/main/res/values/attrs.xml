@@ -9,8 +9,8 @@
         <attr name="BackgroundColor" format="color"/>
         <attr name="StrokeWidth" format="integer"/>
         <attr name="DividerStep" format="integer"/>
-        <attr name="RectColor" format="color"/>
         <attr name="TextColor" format="color"/>
+        <attr name="TextSize" format="integer"/>
     </declare-styleable>
 
 

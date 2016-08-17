@@ -3,19 +3,15 @@ package com.aang.glideratiogauge;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.renderscript.Type;
 import android.support.v4.content.ContextCompat;
-import android.text.LoginFilter;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -41,6 +37,7 @@ public class GlideRatioBar extends View {
     private int mNegativeColor;
     private int backgroundColor;
     private int mTextColor;
+    private int mTextSize;
 
     private float mWidth;
     private float mHeight;
@@ -48,9 +45,9 @@ public class GlideRatioBar extends View {
     private RectF mRect;
     private PointF textCenter;
 
-    TypedArray a;
+    private TypedArray a;
 
-    private float value = 10; //for testing
+    private float value = 0; //for testing
 
 
     public GlideRatioBar(Context context, AttributeSet attrs){
@@ -64,10 +61,10 @@ public class GlideRatioBar extends View {
         mDividerStep = a.getInteger(R.styleable.GlideRatioBar_DividerStep, 5); //Cada cuanto quiero una marca o division
 
         backgroundColor = a.getColor(R.styleable.GlideRatioBar_BackgroundColor, ContextCompat.getColor(context, android.R.color.black));
-        mRectColor = a.getColor(R.styleable.GlideRatioBar_RectColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
         mNegativeColor = a.getColor(R.styleable.GlideRatioBar_NegativeColor, ContextCompat.getColor(context, android.R.color.holo_red_dark));
         mPositiveColor = a.getColor(R.styleable.GlideRatioBar_PositiveColor, ContextCompat.getColor(context, android.R.color.holo_green_dark));
         mTextColor = a.getColor(R.styleable.GlideRatioBar_TextColor, ContextCompat.getColor(context, android.R.color.black));
+        mTextSize = a.getInteger(R.styleable.GlideRatioBar_TextSize, 17);
 
         a.recycle();
         init();
@@ -76,12 +73,12 @@ public class GlideRatioBar extends View {
     public void init(){
         mPaint = new Paint();
         mPaint.setColor(backgroundColor);
-        mPaint.setStrokeWidth(1);
+        mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setAntiAlias(true);
 
         mRectPaint = new Paint();
         mRectPaint.setColor(mRectColor);
-        mRectPaint.setStrokeWidth(mStrokeWidth);
+        mRectPaint.setStrokeWidth(1);
         mRectPaint.setAntiAlias(true);
         //mRectPaint.setShader(new LinearGradient(0, 0, mWidth, 200,  Color.RED,Color.BLUE, Shader.TileMode.CLAMP));//only for see how it works
 
@@ -89,7 +86,7 @@ public class GlideRatioBar extends View {
         textPaint.setColor(mTextColor);
         textPaint.setStrokeWidth(2);
         textPaint.setAntiAlias(true);
-        textPaint.setTextSize(15);
+        textPaint.setTextSize(mTextSize);
         Typeface sample = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC);
         Typeface leadCot = Typeface.createFromAsset(getContext().getAssets(), "lead_coat/leadcoat.ttf");
         //textPaint.setTypeface(leadCot);
@@ -157,6 +154,7 @@ public class GlideRatioBar extends View {
             String rollString = String.valueOf(mStartValue + i);
             float rollStringWidth = textPaint.measureText(rollString);
 
+            //Drawing the number values below the bar
             if ((i*((mWidth/2)/mEndValue)) > mWidth) {
                 break;
             }
@@ -196,22 +194,15 @@ public class GlideRatioBar extends View {
         }*/
 
         /*Showing value in the middle*/
-        canvas.drawText(String.format("%.2f", value), mWidth/2, mHeight/2, textPaint);
+        //canvas.drawText(String.format("%.2f", value), mWidth/2, mHeight/2, textPaint);
 
     }
 
 
     public void setValue(float valor){
         value = valor;
-        if (valor < 0 )
-            changeColor(mNegativeColor);
-        else
-            changeColor(mPositiveColor);
-
+        mRectColor = (valor < 0 ) ? mNegativeColor : mPositiveColor;
         invalidate();
     }
 
-    public void changeColor(int color) {
-        mRectColor = color;
-    }
 }
